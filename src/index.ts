@@ -5,6 +5,7 @@
 
 import { createAzureDevOpsServer } from './server';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { startHttpServer } from './http-server';
 import dotenv from 'dotenv';
 import { AzureDevOpsConfig } from './shared/types';
 import { AuthenticationMethod } from './shared/auth/auth-factory';
@@ -74,11 +75,15 @@ async function main() {
     // Create the server with configuration
     const server = createAzureDevOpsServer(getConfig());
 
-    // Connect to stdio transport
-    const transport = new StdioServerTransport();
-    await server.connect(transport);
-
-    process.stderr.write('Azure DevOps MCP Server running on stdio\n');
+    const httpPort = process.env.MCP_HTTP_PORT;
+    if (httpPort) {
+      await startHttpServer(server, parseInt(httpPort, 10));
+    } else {
+      // Connect to stdio transport
+      const transport = new StdioServerTransport();
+      await server.connect(transport);
+      process.stderr.write('Azure DevOps MCP Server running on stdio\n');
+    }
   } catch (error) {
     process.stderr.write(`Error starting server: ${error}\n`);
     process.exit(1);

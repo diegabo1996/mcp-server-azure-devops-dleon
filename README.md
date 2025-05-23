@@ -47,6 +47,33 @@ The server uses a feature-based architecture where each feature area (like work-
 
 ### Running with NPX
 
+### Building and Running with Docker
+
+You can run the server in a Docker container instead of installing Node.js
+locally. Build the image from the repository root:
+
+```bash
+docker build -t azure-devops-mcp .
+```
+
+Run the container with the required environment variables:
+
+```bash
+docker run --rm -it \
+  -e AZURE_DEVOPS_ORG_URL=https://dev.azure.com/your-organization \
+  -e AZURE_DEVOPS_AUTH_METHOD=azure-identity \
+  -e AZURE_DEVOPS_DEFAULT_PROJECT=your-project-name \
+  -e MCP_HTTP_PORT=10080 \
+  azure-devops-mcp
+```
+
+When `MCP_HTTP_PORT` is set, the server starts an HTTP interface. Map the host
+port to the container port and open `http://localhost:10080/docs` to interact
+with the API using Swagger UI.
+
+Include additional variables such as `AZURE_DEVOPS_PAT`, `AZURE_TENANT_ID`,
+`AZURE_CLIENT_ID`, and `AZURE_CLIENT_SECRET` as needed.
+
 ### Usage with Claude Desktop/Cursor AI
 
 To integrate with Claude Desktop or Cursor AI, add one of the following configurations to your configuration file.
@@ -121,6 +148,7 @@ Key environment variables include:
 | `AZURE_CLIENT_ID`              | Azure AD application ID (for service principals)                                   | Only with service principals | -                |
 | `AZURE_CLIENT_SECRET`          | Azure AD client secret (for service principals)                                    | Only with service principals | -                |
 | `LOG_LEVEL`                    | Logging level (debug, info, warn, error)                                           | No                           | info             |
+| `MCP_HTTP_PORT`                | Port to start the optional HTTP server with Swagger UI                           | No                           | -           |
 
 ## Troubleshooting Authentication
 
